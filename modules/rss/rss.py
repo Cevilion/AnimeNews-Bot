@@ -1,7 +1,8 @@
 import asyncio
+import random
 import feedparser
-from modules.formatting import format_post  # Import format_post directly from bot.py
-from config import STICKER_ID  # Import STICKER_ID from config.py
+from modules.formatting import format_post
+from config import STICKER_ID
 
 async def fetch_and_send_news(app, db, global_settings_collection, urls):
     config = global_settings_collection.find_one({"_id": "config"})
@@ -16,8 +17,10 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
 
         for entry in entries:
             entry_id = entry.get('id', entry.get('link'))
+            title = entry.get('title', 'Untitled News')
 
-            if not db.sent_news.find_one({"entry_id": entry_id}):
+            # Improved duplicate check: Check both entry_id & title
+            if not db.sent_news.find_one({"$or": [{"entry_id": entry_id}, {"title": title}]}):
                 news_item = {
                     "title": entry.title,
                     "summary": entry.get("summary", ""),
@@ -31,7 +34,8 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                 thumbnail_url = entry.media_thumbnail[0]['url'] if 'media_thumbnail' in entry else None
 
                 try:
-                    await asyncio.sleep(5)  # Reduced delay for faster updates
+                    # Increased delay + randomization to reduce post flooding
+                    await asyncio.sleep(random.randint(12, 18))
                     if thumbnail_url:
                         await app.send_photo(chat_id=news_channel, photo=thumbnail_url, caption=msg)
                     else:
@@ -46,5 +50,8 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
 
 async def news_feed_loop(app, db, global_settings_collection, urls):
     while True:
-        await fetch_and_send_news(app, db, global_settings_collection, urls)
-        await asyncio.sleep(30)  # Increased delay for better performance
+        try:
+            await fetch_and_send_news(app, db, global_settings_collection, urls)
+        except Exception as e:
+            print(f"🚨 Error in news feed loop: {e}")
+        await asyncio.sleep(60)  # Increased loop delay for better pacing
