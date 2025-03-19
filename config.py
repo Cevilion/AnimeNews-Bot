@@ -7,6 +7,6 @@ START_PIC = "https://imgur.com/a/aZBWfUL" #Startup Pic
 MONGO_URI = "mongodb+srv://sumitsajwan135:gameno01@cluster0.ja0i0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" #Databse uri get it from https://www.mongodb.com/
 STICKER_ID = "CAACAgUAAxkBAAEOHZJn2oDMces0VpmDLtLk1lIxOqWQCQACkxQAApZn0FY1op6f8Hu6hDYE" # Replace with your sticker's file ID
 NEWS_FEED_URLS = [
-    "https://www.crunchyroll.com/news/rss",
+    "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/en-US/rss",
     "https://myanimelist.net/rss/news.xml"
 ]
