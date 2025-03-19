@@ -11,7 +11,7 @@ import feedparser
 from config import API_ID, API_HASH, BOT_TOKEN, NEWS_FEED_URLS, STICKER_ID, START_PIC, MONGO_URI
 
 from webhook import start_webhook
-
+from modules.formatting import format_post
 from modules.rss.rss import news_feed_loop
 
 BOT_START_TIME = time.time()  # Track bot's start time
