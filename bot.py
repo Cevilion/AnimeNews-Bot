@@ -30,9 +30,6 @@ webhook_thread = threading.Thread(target=start_webhook, daemon=True)
 webhook_thread.start()
 
 
-async def escape_markdown_v2(text: str) -> str:
-    return text
-
 async def send_message_to_user(chat_id: int, message: str, image_url: str = None):
     try:
         if image_url:
@@ -41,10 +38,11 @@ async def send_message_to_user(chat_id: int, message: str, image_url: str = None
             await app.send_message(chat_id, message)
         
         # Send sticker after post
-        if sticker_id:
+        if STICKER_ID:
             await app.send_sticker(chat_id, STICKER_ID)
     except Exception as e:
         print(f"Error sending message: {e}")
+
 
 @app.on_message(filters.command("start"))
 async def start(client, message):
@@ -94,22 +92,23 @@ async def stats_command(client, message):
 async def ping_command(client, message):
     start_time = time.time()
     reply = await message.reply_text("🏓 **Pinging...**")
-    end_time = time.time()
-    ping_time = round((end_time - start_time) * 1000, 2)  # Convert to ms
+    ping_time = round((time.time() - start_time) * 1000, 2)
 
-    await reply.edit_text(f"🏓 **Pong!**\n`{ping_time} ms`")
+    await reply.edit_text(f"🏓 **Pong!** ✅\n`{ping_time} ms`")
+
 
 
 @app.on_message(filters.command("news"))
 async def connect_news(client, message):
     chat_id = message.chat.id
     if len(message.text.split()) == 1:
-        await app.send_message(chat_id, "Please provide a channel id or username (without @).")
+        await app.send_message(chat_id, "❗ **Please provide a channel ID or username (without @).**")
         return
 
-    channel = " ".join(message.text.split()[1:]).strip()
+    channel = " ".join(message.text.split()[1:]).strip().replace("@", "")
     global_settings_collection.update_one({"_id": "config"}, {"$set": {"news_channel": channel}}, upsert=True)
-    await app.send_message(chat_id, f"News channel set to: @{channel}")
+    await app.send_message(chat_id, f"✅ **News channel set to:** @{channel}")
+
 
 sent_news_entries = set()
 
@@ -228,10 +227,14 @@ print(f"Sticker ID: {sticker_id}")
 
 
 async def main():
-    await app.start()
-    print("Bot is running...")
-    asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
-    await asyncio.Event().wait()
+    try:
+        await app.start()
+        print("Bot is running...")
+        asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
+        await asyncio.Event().wait()
+    except Exception as e:
+        print(f"🚨 Error in main loop: {e}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
