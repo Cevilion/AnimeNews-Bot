@@ -55,7 +55,7 @@ async def start(client, message):
             InlineKeyboardButton("Anime Channel", url="https://telegram.dog/animes_piras"),
         ],
         [
-            InlineKeyboardButton("News Net", url="https://t.me/piras_official"),
+            InlineKeyboardButton("News Net", url="https://t.me/AnimeNews_Network"),
         ],
     ])
 
