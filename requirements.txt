@@ -4,4 +4,7 @@ pymongo
 python-dotenv
 flask
 tgcrypto
+tgcrypto-pyrofork
 feedparser
+dnspython
+async-timeout
