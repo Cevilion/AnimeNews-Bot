@@ -8,3 +8,4 @@ tgcrypto-pyrofork
 feedparser
 dnspython
 async-timeout
+pytz
