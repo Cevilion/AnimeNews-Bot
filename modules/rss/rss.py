@@ -1,6 +1,6 @@
 import asyncio
 import feedparser
-from bot import format_post  # Import format_post directly from bot.py
+from modules.formatting import format_post  # Import format_post directly from bot.py
 from config import STICKER_ID  # Import STICKER_ID from config.py
 
 async def fetch_and_send_news(app, db, global_settings_collection, urls):
