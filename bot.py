@@ -10,9 +10,11 @@ import pymongo
 import feedparser
 from config import API_ID, API_HASH, BOT_TOKEN, NEWS_FEED_URLS, STICKER_ID, START_PIC, MONGO_URI
 
-from webhook import start_webhook
+#from webhook import start_webhook
 from modules.formatting import format_post
 from modules.rss.rss import news_feed_loop
+from pyrogram.errors import FloodWait
+
 
 BOT_START_TIME = time.time()  # Track bot's start time
 
@@ -26,8 +28,8 @@ global_settings_collection = db["global_settings"]
 app = Client("GenToolBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 
-webhook_thread = threading.Thread(target=start_webhook, daemon=True)
-webhook_thread.start()
+#webhook_thread = threading.Thread(target=start_webhook, daemon=True)
+#webhook_thread.start()
 
 
 async def send_message_to_user(chat_id: int, message: str, image_url: str = None):
@@ -224,18 +226,40 @@ post, sticker_id = format_post(demo_news, STICKER_ID)
 print(post)
 print(f"Sticker ID: {sticker_id}")
 
-
+@app.on_message(filters.command(["start", "help", "ping", "stats", "testpost", "news"]))
+async def command_handler(client, message):
+    try:
+        if message.command[0] == "start":
+            await start(client, message)
+        elif message.command[0] == "help":
+            await help_command(client, message)
+        elif message.command[0] == "ping":
+            await ping_command(client, message)
+        elif message.command[0] == "stats":
+            await stats_command(client, message)
+        elif message.command[0] == "testpost":
+            await test_post(client, message)
+        elif message.command[0] == "news":
+            await connect_news(client, message)
+    except FloodWait as e:
+        print(f"⚠️ FloodWait triggered! Sleeping for {e.value} seconds...")
+        await asyncio.sleep(e.value)
+    except Exception as e:
+        print(f"❌ Error in command handler: {e}")
 
 async def main():
     try:
-        await app.start()
+        print("Bot is starting...")
+        await app.run()  # Correct method for Pyrogram v2.0+
         print("Bot is running...")
         asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
-        await asyncio.Event().wait()
     except Exception as e:
         print(f"🚨 Error in main loop: {e}")
 
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    print("Bot is starting...")
+    app.run()  # Correct usage for Pyrogram v2.0+
+
+
+
 
