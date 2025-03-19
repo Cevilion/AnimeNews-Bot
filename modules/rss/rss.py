@@ -1,8 +1,9 @@
 import asyncio
 import feedparser
-from bot import app, format_post, STICKER_ID  # Import key elements directly
+from bot import format_post  # Import format_post directly from bot.py
+from config import STICKER_ID  # Import STICKER_ID from config.py
 
-async def fetch_and_send_news(app: Client, db, global_settings_collection, urls):
+async def fetch_and_send_news(app, db, global_settings_collection, urls):
     config = global_settings_collection.find_one({"_id": "config"})
     if not config or "news_channel" not in config:
         return
@@ -37,14 +38,13 @@ async def fetch_and_send_news(app: Client, db, global_settings_collection, urls)
                         await app.send_message(chat_id=news_channel, text=msg)
 
                     await app.send_sticker(chat_id=news_channel, sticker=sticker_id)
-
                     db.sent_news.insert_one({"entry_id": entry_id, "title": entry.title, "link": entry.link})
                     print(f"✅ Sent news: {entry.title}")
                 except Exception as e:
                     print(f"❌ Error sending news message: {entry.title}")
                     print(f"➡️ Details: {e}")
 
-async def news_feed_loop(app: Client, db, global_settings_collection, urls):
+async def news_feed_loop(app, db, global_settings_collection, urls):
     while True:
         await fetch_and_send_news(app, db, global_settings_collection, urls)
-        await asyncio.sleep(30)  # Increased delay for better interval control
+        await asyncio.sleep(30)  # Increased delay for better performance
