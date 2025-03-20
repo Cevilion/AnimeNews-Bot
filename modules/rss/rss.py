@@ -47,7 +47,8 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                 try:
                     await asyncio.sleep(random.randint(12, 18))  # Smart delay to avoid spam
                     if thumbnail_url:
-                        await app.send_photo(chat_id=news_channel, photo=thumbnail_url, caption=msg)
+                        await send_post_with_watermark(app, news_channel, thumbnail_url, msg)
+
                     else:
                         await app.send_message(chat_id=news_channel, text=msg)
 
