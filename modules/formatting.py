@@ -6,7 +6,7 @@ def format_post(news_item, sticker_id):
     summary = news_item.get("summary", "No summary available.")
     link = news_item.get("link", "#")
     date = news_item.get("date", "Unknown Date")
-    studio = news_item.get("studio", "Unknown Studio")
+    source = news_item.get("studio", "Unknown Source")  # Changed from 'studio' to 'source'
     category = news_item.get("category", "General")
 
     # Convert date to IST format with fallback handling
@@ -26,10 +26,10 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🎬 Anime Release Alert!</b>\n"
-            f"<blockquote>🔹 <b>{title}</b> 🔥</blockquote>\n\n"
-            f"📝 <i>{summary}</i>\n\n"
+            f"<blockquote>🔹 {title} 🔥</blockquote>\n\n"
+            f"<i>📝 {summary}</i>\n\n"
             f"📅 <b>Release Date:</b> <code>{date_ist}</code>\n"
-            f"🏢 <b>Studio/Publisher:</b> <u>{studio}</u>\n\n"
+            f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
             f"🔗 <a href='{link}'>Read More</a>\n"
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"#Anime #News #DOTNeWZ\n\n"
@@ -39,10 +39,10 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>📚 Manga Update!</b>\n"
-            f"<blockquote>🔹 <b>{title}</b> 📖</blockquote>\n\n"
-            f"📃 <i>{summary}</i>\n\n"
+            f"<blockquote>🔹 {title} 📖</blockquote>\n\n"
+            f"<i>📃 {summary}</i>\n\n"
             f"📅 <b>Release Date:</b> <code>{date_ist}</code>\n"
-            f"✒️ <b>Publisher:</b> <u>{studio}</u>\n\n"
+            f"✒️ <b>Source:</b> <u>{source}</u>\n\n"
             f"🔗 <a href='{link}'>Read More</a>\n"
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"#Manga #News #DOTNeWZ\n\n"
@@ -52,10 +52,10 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🗞️ Industry News!</b>\n"
-            f"<blockquote>🔹 <b>{title}</b> 📰</blockquote>\n\n"
-            f"💬 <i>{summary}</i>\n\n"
+            f"<blockquote>🔹 {title} 📰</blockquote>\n\n"
+            f"<i>💬 {summary}</i>\n\n"
             f"📅 <b>Date:</b> <code>{date_ist}</code>\n"
-            f"🏢 <b>Source:</b> <u>{studio}</u>\n\n"
+            f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
             f"🔗 <a href='{link}'>Read More</a>\n"
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"#Industry #Anime #DOTNeWZ\n\n"
@@ -65,10 +65,10 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🌟 Latest News!</b>\n"
-            f"<blockquote>🔹 <b>{title}</b> ✨</blockquote>\n\n"
-            f"📝 <i>{summary}</i>\n\n"
+            f"<blockquote>🔹 {title} ✨</blockquote>\n\n"
+            f"<i>📝 {summary}</i>\n\n"
             f"📅 <b>Date:</b> <code>{date_ist}</code>\n"
-            f"🏢 <b>Source:</b> <u>{studio}</u>\n\n"
+            f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
             f"🔗 <a href='{link}'>Read More</a>\n"
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"#Anime #News #DOTNeWZ\n\n"
