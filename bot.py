@@ -18,15 +18,12 @@ from pyrogram.errors import FloodWait
 
 BOT_START_TIME = time.time()  # Track bot's start time
 
-
 mongo_client = pymongo.MongoClient(MONGO_URI)
 db = mongo_client["telegram_bot_db"]
 user_settings_collection = db["user_settings"]
 global_settings_collection = db["global_settings"]
 
-
 app = Client("GenToolBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-
 
 #webhook_thread = threading.Thread(target=start_webhook, daemon=True)
 #webhook_thread.start()
@@ -34,16 +31,23 @@ app = Client("GenToolBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN
 
 async def send_message_to_user(chat_id: int, message: str, image_url: str = None):
     try:
+        if not message or len(message.strip()) == 0:
+            print("❗ Empty message detected. Skipping post...")
+            return
+
         if image_url:
             await app.send_photo(chat_id, image_url, caption=message)
         else:
             await app.send_message(chat_id, message)
-        
-        # Send sticker after post
+
+        # Send sticker only after message success
         if STICKER_ID:
-            await app.send_sticker(chat_id, STICKER_ID)
+            try:
+                await app.send_sticker(chat_id, STICKER_ID)
+            except Exception as e:
+                print(f"⚠️ Sticker error: {e}")
     except Exception as e:
-        print(f"Error sending message: {e}")
+        print(f"❌ Error sending message: {e}")
 
 
 @app.on_message(filters.command("start"))
@@ -88,8 +92,6 @@ async def stats_command(client, message):
         f"🔹 **Ping:** `{ping_time} ms`"
     )
 
-
-
 @app.on_message(filters.command("ping"))
 async def ping_command(client, message):
     start_time = time.time()
@@ -97,8 +99,6 @@ async def ping_command(client, message):
     ping_time = round((time.time() - start_time) * 1000, 2)
 
     await reply.edit_text(f"🏓 **Pong!** ✅\n`{ping_time} ms`")
-
-
 
 @app.on_message(filters.command("news"))
 async def connect_news(client, message):
@@ -110,9 +110,6 @@ async def connect_news(client, message):
     channel = " ".join(message.text.split()[1:]).strip().replace("@", "")
     global_settings_collection.update_one({"_id": "config"}, {"$set": {"news_channel": channel}}, upsert=True)
     await app.send_message(chat_id, f"✅ **News channel set to:** @{channel}")
-
-
-sent_news_entries = set()
 
 @app.on_message(filters.command("help"))
 async def help_command(client, message):
@@ -156,62 +153,6 @@ async def test_post(client, message):
     await message.reply_text("✅ Test post sent successfully!")
 
 
-def format_post(news_item, sticker_id):
-    title = news_item.get("title", "No Title")
-    summary = news_item.get("summary", "No summary available.")
-    link = news_item.get("link", "#")
-    date = news_item.get("date", "Unknown Date")
-    studio = news_item.get("studio", "Unknown Studio")
-    category = news_item.get("category", "General")
-
-    # Category-specific styles
-    if category == "Anime Release":
-        formatted_post = (
-            f"🎬 **Anime Release Alert!**\n\n"
-            f"🔥 *{title}* 🔥\n\n"
-            f"📝 {summary}\n\n"
-            f"📅 *Release Date:* {date}\n"
-            f"🏢 *Studio/Publisher:* {studio}\n\n"
-            f"🔗 [Read More]({link})\n\n"
-            f"#Anime #News #DOTNeWZ\n\n"
-            f"📣 *Posted by DOT NeWZ*\n\n"
-        )
-    elif category == "Manga Update":
-        formatted_post = (
-            f"📚 **Manga Update!**\n\n"
-            f"📖 *{title}* 📖\n\n"
-            f"📃 {summary}\n\n"
-            f"📅 *Release Date:* {date}\n"
-            f"✒️ *Publisher:* {studio}\n\n"
-            f"🔗 [Read More]({link})\n\n"
-            f"#Manga #News #DOTNeWZ\n\n"
-            f"📣 *Posted by DOT NeWZ*\n\n"
-        )
-    elif category == "Industry News":
-        formatted_post = (
-            f"🗞️ **Industry News!**\n\n"
-            f"📰 **{title}** 📰\n\n"
-            f"💬 {summary}\n\n"
-            f"📅 *Date:* {date}\n"
-            f"🏢 *Source:* {studio}\n\n"
-            f"🔗 [Read More]({link})\n\n"
-            f"#Industry #Anime #DOTNeWZ\n\n"
-            f"📣 *Posted by DOT NeWZ*\n\n"
-        )
-    else:
-        formatted_post = (
-            f"🌟 **Latest News!**\n\n"
-            f"✨ **{title}** ✨\n\n"
-            f"📝 {summary}\n\n"
-            f"📅 *Date:* {date}\n"
-            f"🏢 *Source:* {studio}\n\n"
-            f"🔗 [Read More]({link})\n\n"
-            f"#Anime #News #DOTNeWZ\n\n"
-            f"📣 *Posted by DOT NeWZ*\n\n"
-        )
-
-    return formatted_post, sticker_id
-
 # Example news item
 demo_news = {
     "title": "Attack on Titan Final Season Part 4 Announced!",
@@ -226,7 +167,6 @@ post, sticker_id = format_post(demo_news, STICKER_ID)
 print(post)
 print(f"Sticker ID: {sticker_id}")
 
-
 if __name__ == "__main__":
     print("Bot is starting...")
 
@@ -237,15 +177,6 @@ if __name__ == "__main__":
         # Start the news loop safely inside the running event loop
         asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
 
-        await asyncio.Event().wait()  # Keeps the bot running indefinitely
+        await app.idle()  # Correct method for PyroFork to keep bot running
 
     asyncio.run(start_bot())
-
-
-
-
-
-
-
-
-
