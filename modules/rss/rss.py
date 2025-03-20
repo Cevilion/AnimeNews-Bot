@@ -60,7 +60,7 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                     print(f"❌ Error sending news message: {entry.title}")
                     print(f"➡️ Details: {traceback.format_exc()}")
 
-async def add_watermark(image_url, watermark_text="DOT NeWZ"):
+async def add_watermark(image_url, watermark_text="PiRAS"):
     async with aiohttp.ClientSession() as session:
         async with session.get(image_url) as resp:
             if resp.status == 200:
