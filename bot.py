@@ -227,22 +227,21 @@ print(post)
 print(f"Sticker ID: {sticker_id}")
 
 
-
 if __name__ == "__main__":
     print("Bot is starting...")
 
-    @app.on_message(filters.command("start"))
-    async def start_handler(client, message):
-        await start(client, message)
-
-    async def run_bot():
+    async def start_bot():
         await app.start()
         print("✅ Bot started successfully!")
-        asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
 
-        await asyncio.Event().wait()  # Keeps the bot running indefinitely
+        # Run both the news loop and PyroFork's idle to handle commands
+        await asyncio.gather(
+            news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS),
+            app.run()  # Ensures command handlers work
+        )
 
-    asyncio.run(run_bot())
+    asyncio.run(start_bot())
+
 
 
 
