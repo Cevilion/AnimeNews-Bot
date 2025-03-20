@@ -7,8 +7,9 @@ from config import STICKER_ID
 async def fetch_and_send_news(app, db, global_settings_collection, urls):
     config = global_settings_collection.find_one({"_id": "config"})
     if not config or "news_channel" not in config:
-       print("❗ No news channel configured.")
-        return
+    print("❗ No news channel configured.")
+    return
+
 
     news_channel = "@" + config["news_channel"]
 
