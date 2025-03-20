@@ -7,15 +7,20 @@ from config import STICKER_ID
 async def fetch_and_send_news(app, db, global_settings_collection, urls):
     config = global_settings_collection.find_one({"_id": "config"})
     if not config or "news_channel" not in config:
-    print("❗ No news channel configured.")
-    return
-
+        print("❗ No news channel configured.")
+        return
 
     news_channel = "@" + config["news_channel"]
 
     for url in urls:
+        print(f"🔎 Fetching RSS URL: {url}")
         feed = await asyncio.to_thread(feedparser.parse, url)
-        entries = list(feed.entries)[::-1]  # Reverse order to send newest last
+
+        if not feed.entries:
+            print(f"❗ No new entries found in {url}")
+            continue
+
+        entries = list(feed.entries)[::-1]
 
         for entry in entries:
             entry_id = entry.get('id', entry.get('link'))
@@ -36,8 +41,7 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                 thumbnail_url = entry.media_thumbnail[0]['url'] if 'media_thumbnail' in entry else None
 
                 try:
-                    # Increased delay + randomization to reduce post flooding
-                    await asyncio.sleep(random.randint(12, 18))
+                    await asyncio.sleep(random.randint(12, 18))  # Smart delay to avoid spam
                     if thumbnail_url:
                         await app.send_photo(chat_id=news_channel, photo=thumbnail_url, caption=msg)
                     else:
@@ -47,14 +51,23 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                     db.sent_news.insert_one({"entry_id": entry_id, "title": entry.title, "link": entry.link})
                     print(f"✅ Sent news: {entry.title}")
                 except Exception as e:
+                    import traceback
                     print(f"❌ Error sending news message: {entry.title}")
-                    print(f"➡️ Details: {e}")
+                    print(f"➡️ Details: {traceback.format_exc()}")
 
 async def news_feed_loop(app, db, global_settings_collection, urls):
-    print("🔄 Starting news loop...")  # Confirm loop activation
+    print("🔄 Starting news loop...")
+
+    try:
+        db.command("ping")  # MongoDB connection check
+        print("✅ MongoDB connection confirmed!")
+    except Exception as e:
+        print(f"❗ MongoDB connection failed: {e}")
+        return
+    
     while True:
         try:
-            print("🔍 Checking for new news entries...")  # Add this log to track activity
+            print("🔍 Checking for new news entries...")
             await fetch_and_send_news(app, db, global_settings_collection, urls)
         except Exception as e:
             print(f"🚨 Error in news feed loop: {e}")
