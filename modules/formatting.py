@@ -26,7 +26,7 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🎬 Anime Release Alert!</b>\n"
-            f"<blockquote>🔹 {title} 🔥</blockquote>\n\n"
+            f"<b>🔹 {title} 🔥</b>\n\n"
             f"<i>📝 {summary}</i>\n\n"
             f"📅 <b>Release Date:</b> <code>{date_ist}</code>\n"
             f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
@@ -39,7 +39,7 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>📚 Manga Update!</b>\n"
-            f"<blockquote>🔹 {title} 📖</blockquote>\n\n"
+            f"<b>🔹 {title} 📖</b>\n\n"
             f"<i>📃 {summary}</i>\n\n"
             f"📅 <b>Release Date:</b> <code>{date_ist}</code>\n"
             f"✒️ <b>Source:</b> <u>{source}</u>\n\n"
@@ -52,7 +52,7 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🗞️ Industry News!</b>\n"
-            f"<blockquote>🔹 {title} 📰</blockquote>\n\n"
+            f"<b>🔹 {title} 📰</b>\n\n"
             f"<i>💬 {summary}</i>\n\n"
             f"📅 <b>Date:</b> <code>{date_ist}</code>\n"
             f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
@@ -65,7 +65,7 @@ def format_post(news_item, sticker_id):
         formatted_post = (
             f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"<b>🌟 Latest News!</b>\n"
-            f"<blockquote>🔹 {title} ✨</blockquote>\n\n"
+            f"<b>🔹 {title} ✨</b>\n\n"
             f"<i>📝 {summary}</i>\n\n"
             f"📅 <b>Date:</b> <code>{date_ist}</code>\n"
             f"🏢 <b>Source:</b> <u>{source}</u>\n\n"
