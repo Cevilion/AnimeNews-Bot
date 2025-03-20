@@ -234,13 +234,12 @@ if __name__ == "__main__":
         await app.start()
         print("✅ Bot started successfully!")
 
-        # Run both the news loop and PyroFork's idle to handle commands
-        await asyncio.gather(
-            news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS),
-            app.run()  # Ensures command handlers work
-        )
+        # Run both the news loop and PyroFork's idle for command handling
+        asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
+        await app.idle()  # Correct method for PyroFork to keep bot running
 
     asyncio.run(start_bot())
+
 
 
 
