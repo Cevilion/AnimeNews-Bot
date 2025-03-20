@@ -249,8 +249,18 @@ async def command_handler(client, message):
 
 if __name__ == "__main__":
     print("Bot is starting...")
-    asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
-    app.run()
+
+    async def start_bot():
+        await app.start()
+        print("✅ Bot started successfully!")
+        
+        # Start the news loop safely inside the running event loop
+        asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
+
+        await app.idle()  # Keeps the bot running
+
+    asyncio.run(start_bot())  # Correct usage for async code execution
+
 
 
 
