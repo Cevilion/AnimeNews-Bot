@@ -9,3 +9,5 @@ feedparser
 dnspython
 async-timeout
 pytz
+pillow
+
