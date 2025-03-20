@@ -10,7 +10,7 @@ def format_post(news_item, sticker_id):
     category = news_item.get("category", "General")
 
     # Convert date to IST format with fallback handling
-    try:
+try:
     if "GMT" in date:
         date_obj = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S GMT")
         date_obj = date_obj.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Kolkata"))
