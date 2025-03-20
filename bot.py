@@ -231,11 +231,19 @@ print(f"Sticker ID: {sticker_id}")
 if __name__ == "__main__":
     print("Bot is starting...")
 
-    async def start_bot():
+    @app.on_message(filters.command("start"))
+    async def start_handler(client, message):
+        await start(client, message)
+
+    async def run_bot():
+        await app.start()
         print("✅ Bot started successfully!")
         asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
 
-    app.run()  # Correct method for Pyrogram v2.0+
+        await asyncio.Event().wait()  # Keeps the bot running indefinitely
+
+    asyncio.run(run_bot())
+
 
 
 
