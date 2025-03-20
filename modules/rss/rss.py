@@ -59,6 +59,38 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                     print(f"❌ Error sending news message: {entry.title}")
                     print(f"➡️ Details: {traceback.format_exc()}")
 
+async def add_watermark(image_url, watermark_text="DOT NeWZ"):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(image_url) as resp:
+            if resp.status == 200:
+                image_bytes = await resp.read()
+                image = Image.open(io.BytesIO(image_bytes))
+
+                # Add watermark
+                draw = ImageDraw.Draw(image)
+                font = ImageFont.load_default()
+
+                # Position watermark at bottom-right
+                text_width, text_height = draw.textsize(watermark_text, font)
+                position = (image.width - text_width - 10, image.height - text_height - 10)
+
+                draw.text(position, watermark_text, font=font, fill="white")
+
+                # Save modified image to bytes
+                output_buffer = io.BytesIO()
+                image.save(output_buffer, format="JPEG")
+                output_buffer.seek(0)
+
+                return output_buffer
+
+async def send_post_with_watermark(app, news_channel, image_url, msg):
+    try:
+        watermark_image = await add_watermark(image_url)
+        await app.send_photo(chat_id=news_channel, photo=watermark_image, caption=msg)
+    except Exception as e:
+        print(f"Error sending watermarked post: {e}")
+
+
 async def news_feed_loop(app, db, global_settings_collection, urls):
     print("🔄 Starting news loop...")
 
