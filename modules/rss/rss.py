@@ -49,9 +49,11 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
                     print(f"➡️ Details: {e}")
 
 async def news_feed_loop(app, db, global_settings_collection, urls):
+    print("🔄 Starting news loop...")  # Confirm loop activation
     while True:
         try:
+            print("🔍 Checking for new news entries...")  # Add this log to track activity
             await fetch_and_send_news(app, db, global_settings_collection, urls)
         except Exception as e:
             print(f"🚨 Error in news feed loop: {e}")
-        await asyncio.sleep(60)  # Increased loop delay for better pacing
+        await asyncio.sleep(60)
