@@ -226,39 +226,17 @@ post, sticker_id = format_post(demo_news, STICKER_ID)
 print(post)
 print(f"Sticker ID: {sticker_id}")
 
-@app.on_message(filters.command(["start", "help", "ping", "stats", "testpost", "news"]))
-async def command_handler(client, message):
-    try:
-        if message.command[0] == "start":
-            await start(client, message)
-        elif message.command[0] == "help":
-            await help_command(client, message)
-        elif message.command[0] == "ping":
-            await ping_command(client, message)
-        elif message.command[0] == "stats":
-            await stats_command(client, message)
-        elif message.command[0] == "testpost":
-            await test_post(client, message)
-        elif message.command[0] == "news":
-            await connect_news(client, message)
-    except FloodWait as e:
-        print(f"⚠️ FloodWait triggered! Sleeping for {e.value} seconds...")
-        await asyncio.sleep(e.value)
-    except Exception as e:
-        print(f"❌ Error in command handler: {e}")
+
 
 if __name__ == "__main__":
     print("Bot is starting...")
 
     async def start_bot():
-        await app.start()
         print("✅ Bot started successfully!")
-        
-        # Start the news loop safely inside the running event loop
         asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
 
-        await asyncio.Event().wait()  # Keeps the bot running indefinitely
+    app.run()  # Correct method for Pyrogram v2.0+
 
-    asyncio.run(start_bot())  # Correct usage for Pyrogram v2.0+
+
 
 
