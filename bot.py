@@ -247,18 +247,10 @@ async def command_handler(client, message):
     except Exception as e:
         print(f"❌ Error in command handler: {e}")
 
-async def main():
-    try:
-        print("Bot is starting...")
-        await app.run()  # Correct method for Pyrogram v2.0+
-        print("Bot is running...")
-        asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
-    except Exception as e:
-        print(f"🚨 Error in main loop: {e}")
-
 if __name__ == "__main__":
     print("Bot is starting...")
-    app.run()  # Correct usage for Pyrogram v2.0+
+    asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
+    app.run()
 
 
 
