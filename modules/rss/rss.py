@@ -30,7 +30,6 @@ async def fetch_and_send_news(app, db, global_settings_collection, urls):
             entry_id = entry.get('id', entry.get('link'))
             title = entry.get('title', 'Untitled News')
 
-            # Improved duplicate check: Check both entry_id & title
             if not db.sent_news.find_one({"$or": [{"entry_id": entry_id}, {"title": title}]}):
                 news_item = {
                     "title": entry.title,
@@ -69,17 +68,24 @@ async def add_watermark(image_url, watermark_text="PiRAS"):
 
                 # Add watermark
                 draw = ImageDraw.Draw(image)
-                font = ImageFont.load_default()
+                try:
+                    font = ImageFont.truetype("arial.ttf", 40)  # TTF font for better visuals
+                except:
+                    font = ImageFont.load_default()  # Fallback if TTF isn't available
 
-                # Position watermark at bottom-right
+                # Position watermark at bottom-right with shadow for visibility
                 text_width, text_height = draw.textsize(watermark_text, font)
-                position = (image.width - text_width - 10, image.height - text_height - 10)
+                position = (image.width - text_width - 20, image.height - text_height - 20)
 
-                draw.text(position, watermark_text, font=font, fill="white")
+                # Add shadow for better visibility
+                shadow_position = (position[0] + 2, position[1] + 2)
+                draw.text(shadow_position, watermark_text, font=font, fill="black")  # Shadow
+                draw.text(position, watermark_text, font=font, fill="white")  # Watermark text
 
-                # Save modified image to bytes
+                # Save modified image to bytes (retain original format)
                 output_buffer = io.BytesIO()
-                image.save(output_buffer, format="JPEG")
+                image_format = image.format if image.format else "JPEG"
+                image.save(output_buffer, format=image_format)
                 output_buffer.seek(0)
 
                 return output_buffer
@@ -88,9 +94,9 @@ async def send_post_with_watermark(app, news_channel, image_url, msg):
     try:
         watermark_image = await add_watermark(image_url)
         await app.send_photo(chat_id=news_channel, photo=watermark_image, caption=msg)
+        print("✅ Post with watermark sent successfully!")
     except Exception as e:
-        print(f"Error sending watermarked post: {e}")
-
+        print(f"❌ Error sending watermarked post: {e}")
 
 async def news_feed_loop(app, db, global_settings_collection, urls):
     print("🔄 Starting news loop...")
@@ -101,7 +107,7 @@ async def news_feed_loop(app, db, global_settings_collection, urls):
     except Exception as e:
         print(f"❗ MongoDB connection failed: {e}")
         return
-    
+
     while True:
         try:
             print("🔍 Checking for new news entries...")
