@@ -11,15 +11,18 @@ def format_post(news_item, sticker_id):
 
     # Convert date to IST format with fallback handling
     try:
-        if "GMT" in date:
-            date_obj = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S GMT")
-            date_obj = date_obj.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Kolkata"))
-        else:
-            date_obj = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S %z")
+    if "GMT" in date:
+        date_obj = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S GMT")
+        date_obj = date_obj.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Kolkata"))
+    elif "T" in date and "Z" in date:
+        date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Kolkata"))
+    else:
+        date_obj = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S %z")
 
-        date_ist = date_obj.strftime("%d %B %Y | %I:%M %p IST")
-    except ValueError:
-        date_ist = date  # Use original date if conversion fails
+    date_ist = date_obj.strftime("%d %B %Y | %I:%M %p IST")
+except ValueError:
+    date_ist = date  # Use original date if conversion fails
+
 
     # Category-specific styles
     if category == "Anime Release":
