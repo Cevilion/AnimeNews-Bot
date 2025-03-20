@@ -250,10 +250,15 @@ async def command_handler(client, message):
 if __name__ == "__main__":
     print("Bot is starting...")
 
-    @app.on_idle()  # Correct method for Pyrogram v2.0+
-    async def start_news_loop():
+    async def start_bot():
+        await app.start()
         print("✅ Bot started successfully!")
+        
+        # Start the news loop safely inside the running event loop
         asyncio.create_task(news_feed_loop(app, db, global_settings_collection, NEWS_FEED_URLS))
 
-    app.run()  # Correct method to keep the bot running in Pyrogram v2.0+
+        await asyncio.Event().wait()  # Keeps the bot running indefinitely
+
+    asyncio.run(start_bot())  # Correct usage for Pyrogram v2.0+
+
 
